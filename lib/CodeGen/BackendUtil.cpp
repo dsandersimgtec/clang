@@ -238,7 +238,8 @@ static void addDataFlowSanitizerPass(const PassManagerBuilder &Builder,
 
 static TargetLibraryInfoImpl *createTLII(llvm::Triple &TargetTriple,
                                          const CodeGenOptions &CodeGenOpts) {
-  TargetLibraryInfoImpl *TLII = new TargetLibraryInfoImpl(TargetTriple);
+  TargetLibraryInfoImpl *TLII =
+      new TargetLibraryInfoImpl(llvm::TargetTuple(TargetTriple));
   if (!CodeGenOpts.SimplifyLibCalls)
     TLII->disableAllFunctions();
 
