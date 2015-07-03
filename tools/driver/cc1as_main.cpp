@@ -292,6 +292,8 @@ static bool ExecuteAssembler(AssemblerInvocation &Opts,
   }
 
   SourceMgr SrcMgr;
+  Triple TheTriple(Opts.Triple);
+  TargetTuple TT(TheTriple);
 
   // Tell SrcMgr about this buffer, which is what the parser will pick up.
   SrcMgr.AddNewSourceBuffer(std::move(*Buffer), SMLoc());
@@ -303,7 +305,7 @@ static bool ExecuteAssembler(AssemblerInvocation &Opts,
   std::unique_ptr<MCRegisterInfo> MRI(TheTarget->createMCRegInfo(Opts.Triple));
   assert(MRI && "Unable to create target register info!");
 
-  std::unique_ptr<MCAsmInfo> MAI(TheTarget->createMCAsmInfo(*MRI, Opts.Triple));
+  std::unique_ptr<MCAsmInfo> MAI(TheTarget->createMCAsmInfo(*MRI, TT));
   assert(MAI && "Unable to create target asm info!");
 
   // Ensure MCAsmInfo initialization occurs before any use, otherwise sections
