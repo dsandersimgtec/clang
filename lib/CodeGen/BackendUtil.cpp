@@ -428,6 +428,8 @@ TargetMachine *EmitAssemblyHelper::CreateTargetMachine(bool MustCreateTM) {
       Diags.Report(diag::err_fe_unable_to_create_target) << Error;
     return nullptr;
   }
+  llvm::Triple TheTriple(Triple);
+  llvm::TargetTuple TT(TheTriple);
 
   unsigned CodeModel =
     llvm::StringSwitch<unsigned>(CodeGenOpts.CodeModel)
@@ -544,9 +546,8 @@ TargetMachine *EmitAssemblyHelper::CreateTargetMachine(bool MustCreateTM) {
   Options.MCOptions.AsmVerbose = CodeGenOpts.AsmVerbose;
   Options.MCOptions.ABIName = TargetOpts.ABI;
 
-  TargetMachine *TM = TheTarget->createTargetMachine(Triple, TargetOpts.CPU,
-                                                     FeaturesStr, Options,
-                                                     RM, CM, OptLevel);
+  TargetMachine *TM = TheTarget->createTargetMachine(
+      TT, TargetOpts.CPU, FeaturesStr, Options, RM, CM, OptLevel);
 
   return TM;
 }
