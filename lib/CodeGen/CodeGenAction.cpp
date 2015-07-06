@@ -765,11 +765,12 @@ void CodeGenAction::ExecuteAction() {
       return;
     }
     const TargetOptions &TargetOpts = CI.getTargetOpts();
-    if (TheModule->getTargetTriple() != TargetOpts.Triple) {
+    if (TheModule->getTargetTuple().getTargetTriple().str() !=
+        TargetOpts.Triple) {
       CI.getDiagnostics().Report(SourceLocation(),
                                  diag::warn_fe_override_module)
           << TargetOpts.Triple;
-      TheModule->setTargetTriple(TargetOpts.Triple);
+      TheModule->setTargetTuple(TargetTuple(Triple(TargetOpts.Triple)));
     }
 
     LLVMContext &Ctx = TheModule->getContext();

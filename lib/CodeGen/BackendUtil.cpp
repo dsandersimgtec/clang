@@ -236,7 +236,7 @@ static void addDataFlowSanitizerPass(const PassManagerBuilder &Builder,
   PM.add(createDataFlowSanitizerPass(LangOpts.SanitizerBlacklistFiles));
 }
 
-static TargetLibraryInfoImpl *createTLII(llvm::Triple &TargetTriple,
+static TargetLibraryInfoImpl *createTLII(const llvm::Triple &TargetTriple,
                                          const CodeGenOptions &CodeGenOpts) {
   TargetLibraryInfoImpl *TLII =
       new TargetLibraryInfoImpl(llvm::TargetTuple(TargetTriple));
@@ -356,7 +356,7 @@ void EmitAssemblyHelper::CreatePasses() {
   }
 
   // Figure out TargetLibraryInfo.
-  Triple TargetTriple(TheModule->getTargetTriple());
+  const Triple &TargetTriple = TheModule->getTargetTuple().getTargetTriple();
   PMBuilder.LibraryInfo = createTLII(TargetTriple, CodeGenOpts);
 
   switch (Inlining) {
@@ -421,9 +421,7 @@ void EmitAssemblyHelper::CreatePasses() {
 TargetMachine *EmitAssemblyHelper::CreateTargetMachine(bool MustCreateTM) {
   // Create the TargetMachine for generating code.
   std::string Error;
-  std::string Triple = TheModule->getTargetTriple();
-  llvm::Triple TheTriple(Triple);
-  llvm::TargetTuple TT(TheTriple);
+  const llvm::TargetTuple &TT = TheModule->getTargetTuple();
   const llvm::Target *TheTarget = TargetRegistry::lookupTarget(TT, Error);
   if (!TheTarget) {
     if (MustCreateTM)
@@ -559,7 +557,8 @@ bool EmitAssemblyHelper::AddEmitPasses(BackendAction Action,
   legacy::PassManager *PM = getCodeGenPasses();
 
   // Add LibraryInfo.
-  llvm::Triple TargetTriple(TheModule->getTargetTriple());
+  const llvm::Triple &TargetTriple =
+      TheModule->getTargetTuple().getTargetTriple();
   std::unique_ptr<TargetLibraryInfoImpl> TLII(
       createTLII(TargetTriple, CodeGenOpts));
   PM->add(new TargetLibraryInfoWrapperPass(*TLII));

@@ -93,7 +93,7 @@ public:
     if (Diags.hasErrorOccurred())
       return;
 
-    M->setTargetTriple(Ctx.getTargetInfo().getTriple().getTriple());
+    M->setTargetTuple(llvm::TargetTuple(Ctx.getTargetInfo().getTriple()));
     M->setDataLayout(Ctx.getTargetInfo().getDataLayoutString());
 
     // Finalize the Builder.

@@ -21,6 +21,7 @@
 #include "clang/Basic/TargetInfo.h"
 #include "clang/Frontend/CodeGenOptions.h"
 #include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/TargetTuple.h"
 #include "llvm/IR/DataLayout.h"
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Module.h"
@@ -97,7 +98,7 @@ namespace {
     void Initialize(ASTContext &Context) override {
       Ctx = &Context;
 
-      M->setTargetTriple(Ctx->getTargetInfo().getTriple().getTriple());
+      M->setTargetTuple(llvm::TargetTuple(Ctx->getTargetInfo().getTriple()));
       M->setDataLayout(Ctx->getTargetInfo().getDataLayoutString());
       Builder.reset(new CodeGen::CodeGenModule(Context, HeaderSearchOpts,
                                                PreprocessorOpts, CodeGenOpts,
