@@ -277,11 +277,15 @@ getOutputStream(AssemblerInvocation &Opts, DiagnosticsEngine &Diags,
 
 static bool ExecuteAssembler(AssemblerInvocation &Opts,
                              DiagnosticsEngine &Diags) {
+  Triple TheTriple(Opts.Triple);
+  TargetTuple TT(TheTriple);
+
   // Get the target specific parser.
   std::string Error;
-  const Target *TheTarget = TargetRegistry::lookupTarget(Opts.Triple, Error);
+  const Target *TheTarget = TargetRegistry::lookupTarget(TT, Error);
   if (!TheTarget)
-    return Diags.Report(diag::err_target_unknown_triple) << Opts.Triple;
+    return Diags.Report(diag::err_target_unknown_triple)
+           << TT.getTargetTriple().str();
 
   ErrorOr<std::unique_ptr<MemoryBuffer>> Buffer =
       MemoryBuffer::getFileOrSTDIN(Opts.InputFile);
@@ -292,8 +296,6 @@ static bool ExecuteAssembler(AssemblerInvocation &Opts,
   }
 
   SourceMgr SrcMgr;
-  Triple TheTriple(Opts.Triple);
-  TargetTuple TT(TheTriple);
 
   // Tell SrcMgr about this buffer, which is what the parser will pick up.
   SrcMgr.AddNewSourceBuffer(std::move(*Buffer), SMLoc());

@@ -422,14 +422,14 @@ TargetMachine *EmitAssemblyHelper::CreateTargetMachine(bool MustCreateTM) {
   // Create the TargetMachine for generating code.
   std::string Error;
   std::string Triple = TheModule->getTargetTriple();
-  const llvm::Target *TheTarget = TargetRegistry::lookupTarget(Triple, Error);
+  llvm::Triple TheTriple(Triple);
+  llvm::TargetTuple TT(TheTriple);
+  const llvm::Target *TheTarget = TargetRegistry::lookupTarget(TT, Error);
   if (!TheTarget) {
     if (MustCreateTM)
       Diags.Report(diag::err_fe_unable_to_create_target) << Error;
     return nullptr;
   }
-  llvm::Triple TheTriple(Triple);
-  llvm::TargetTuple TT(TheTriple);
 
   unsigned CodeModel =
     llvm::StringSwitch<unsigned>(CodeGenOpts.CodeModel)

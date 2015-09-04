@@ -490,7 +490,7 @@ StmtResult Parser::ParseMicrosoftAsmStatement(SourceLocation AsmLoc) {
   // We need an actual supported target.
   const llvm::Triple &TheTriple = Actions.Context.getTargetInfo().getTriple();
   llvm::Triple::ArchType ArchTy = TheTriple.getArch();
-  const std::string &TTStr = TheTriple.getTriple();
+  llvm::TargetTuple TT(TheTriple);
   const llvm::Target *TheTarget = nullptr;
   bool UnsupportedArch =
       (ArchTy != llvm::Triple::x86 && ArchTy != llvm::Triple::x86_64);
@@ -498,12 +498,10 @@ StmtResult Parser::ParseMicrosoftAsmStatement(SourceLocation AsmLoc) {
     Diag(AsmLoc, diag::err_msasm_unsupported_arch) << TheTriple.getArchName();
   } else {
     std::string Error;
-    TheTarget = llvm::TargetRegistry::lookupTarget(TTStr, Error);
+    TheTarget = llvm::TargetRegistry::lookupTarget(TT, Error);
     if (!TheTarget)
       Diag(AsmLoc, diag::err_msasm_unable_to_create_target) << Error;
   }
-
-  llvm::TargetTuple TT(TheTriple);
 
   assert(!LBraceLocs.empty() && "Should have at least one location here");
 

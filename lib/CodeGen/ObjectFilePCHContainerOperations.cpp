@@ -103,7 +103,7 @@ public:
     // Ensure the target exists.
     std::string Error;
     auto Triple = Ctx.getTargetInfo().getTriple();
-    if (!llvm::TargetRegistry::lookupTarget(Triple.getTriple(), Error))
+    if (!llvm::TargetRegistry::lookupTarget(llvm::TargetTuple(Triple), Error))
       llvm::report_fatal_error(Error);
 
     // Emit the serialized Clang AST into its own section.

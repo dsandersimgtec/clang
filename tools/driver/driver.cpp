@@ -290,8 +290,10 @@ static void insertArgsFromProgramName(StringRef ProgName,
 
   // Infer target from the prefix.
   StringRef Prefix = ProgName.slice(0, LastComponent);
+  llvm::Triple TheTriple(Prefix);
+  llvm::TargetTuple TT(TheTriple);
   std::string IgnoredError;
-  if (llvm::TargetRegistry::lookupTarget(Prefix, IgnoredError)) {
+  if (llvm::TargetRegistry::lookupTarget(TT, IgnoredError)) {
     auto it = ArgVector.begin();
     if (it != ArgVector.end())
       ++it;
